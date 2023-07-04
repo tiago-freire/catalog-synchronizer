@@ -1,0 +1,20 @@
+{
+  "name": "catalog-synchronizer-admin-prototype",
+  "vendor": "ssesandbox04",
+  "version": "0.0.1",
+  "title": "Catalog Synchronizer Admin (Prototype)",
+  "description": "Catalog Synchronizer captures product changes through an EndPoint that receives Affiliate Notifications. Received notifications trigger Catalog changes synchronization to third-party systems such as Nosto or Algolia.",
+  "scripts": {
+    "postreleasy": "vtex publish"
+  },
+  "dependencies": {
+    "vtex.styleguide": "9.x"
+  },
+  "builders": {
+    "react": "3.x",
+    "admin": "0.x",
+    "messages": "1.x",
+    "docs": "0.x"
+  },
+  "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
+}

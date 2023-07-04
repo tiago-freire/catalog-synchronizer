@@ -1,0 +1,9 @@
+{
+  "admin-catalogsynchronizer.navigation.label-group": "Catalog Synchronizer Admin",
+  "admin-catalogsynchronizer.navigation.label-table": "Catalog Synchronizer Admin",
+  "admin-catalogsynchronizer.navigation.search.kws": "synchronizer, catalog, cs, nosto, algolia",
+  "admin-catalogsynchronizer.navigation.details.search.kws": "synchronizer, catalog, cs, nosto, algolia",
+  "admin-catalogsynchronizer.navigation.table.search.kws": "synchronizer, catalog, cs, nosto, algolia",
+  "admin-catalogsynchronizer.hello-world": "Catalog Synchronizer Admin",
+  "admin-catalogsynchronizer.details": "Detalhes Catalog Synchronizer Admin"
+}

@@ -1,0 +1,12 @@
+{
+  "section": "other",
+  "titleId": "admin-catalogsynchronizer.navigation.label-group",
+  "searchKeyWordsHelpers": "admin-catalogsynchronizer.navigation.search.kws",
+  "subSectionItems": [
+    {
+      "labelId": "admin-catalogsynchronizer.navigation.label-table",
+      "path": "/admin/catalogsynchronizer",
+      "searchKeyWordsHelpers": "admin-catalogsynchronizer.navigation.table.search.kws"
+    }
+  ]
+}

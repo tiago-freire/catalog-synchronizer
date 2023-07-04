@@ -1,0 +1,10 @@
+{
+  "admin.app.synchronizer": {
+    "component": "AdminCatalogSynchronizer",
+    "path": "/admin/app/catalogsynchronizer"
+  },
+  "admin.app.synchronizer-detail": {
+    "component": "AdminCatalogSynchronizerDetail",
+    "path": "/admin/app/catalogsynchronizer/:id"
+  }
+}
