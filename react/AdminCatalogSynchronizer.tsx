@@ -1,7 +1,30 @@
-import React, { FC, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { Button, Card, Input, InputButton, Layout, PageBlock, PageHeader, Textarea, Toggle } from 'vtex.styleguide';
-import './styles.global.css';
+import React, { FC, useState } from 'react'
+import { FormattedMessage } from 'react-intl'
+import {
+  Button,
+  Card,
+  Input,
+  InputButton,
+  Layout,
+  PageBlock,
+  PageHeader,
+  Textarea,
+  Toggle,
+} from 'vtex.styleguide'
+
+import { useForceSynchronization, withQueryProvider } from './services'
+import './styles.global.css'
+
+const moveTextareaCursorToEnd = (textarea?: HTMLTextAreaElement) => {
+  window.setTimeout(() => {
+    textarea?.removeAttribute('disabled')
+    textarea?.focus()
+    textarea?.setSelectionRange(textarea.value.length, textarea.value.length)
+    textarea?.setAttribute('disabled', '')
+  }, 100)
+}
+
+const DEFAULT_LOGGING_TEXT = 'logging starts here...\n'
 
 const AdminCatalogSynchronizer: FC = () => {
   const [state, setState] = useState({
@@ -12,79 +35,152 @@ const AdminCatalogSynchronizer: FC = () => {
     algoliaApplicationID: '',
     algoliaAPIKey: '',
     productIDToForceSynchronization: '',
-    loggingText: 'logging starts here...\n',
-  });
+    loggingText: DEFAULT_LOGGING_TEXT,
+  })
 
   const updateNostoAccountID = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
-    setState((prevState) => ({ ...prevState, nostoAccountID: value }));
-  };
+    const { value } = event.target
+    setState((prevState) => ({ ...prevState, nostoAccountID: value }))
+  }
 
   const updateNostoToken = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
-    setState((prevState) => ({ ...prevState, nostoToken: value }));
-  };
+    const { value } = event.target
+    setState((prevState) => ({ ...prevState, nostoToken: value }))
+  }
 
-  const updateAlgoliaApplicationID = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
-    setState((prevState) => ({ ...prevState, algoliaApplicationID: value }));
-  };
+  const updateAlgoliaApplicationID = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { value } = event.target
+    setState((prevState) => ({ ...prevState, algoliaApplicationID: value }))
+  }
 
   const updateAlgoliaAPIKey = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
-    setState((prevState) => ({ ...prevState, algoliaAPIKey: value }));
-  };
+    const { value } = event.target
+    setState((prevState) => ({ ...prevState, algoliaAPIKey: value }))
+  }
 
-  const updateProductIDToForceSynchronization = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
-    setState((prevState) => ({ ...prevState, productIDToForceSynchronization: value }));
-  };
+  const updateProductIDToForceSynchronization = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { value } = event.target
+    setState((prevState) => ({
+      ...prevState,
+      productIDToForceSynchronization: value,
+    }))
+  }
 
-  const initiateForcedSynchronization = (evt: React.FormEvent<HTMLFormElement>) => {
-    evt.preventDefault();
-    if (state.productIDToForceSynchronization) {
-      setState((prevState) => ({
-        ...prevState,
-        loggingText:
-          prevState.loggingText +
-          `Started product id "${state.productIDToForceSynchronization}" forced synchronization...\n`,
-        productIDToForceSynchronization: '',
-      }));
+  const textareaRef = React.useRef<HTMLTextAreaElement>()
+
+  const logger = (text: string, prefix = '') => {
+    setState((prevState) => ({
+      ...prevState,
+      loggingText: `${
+        prevState.loggingText
+      }${prefix}${new Date().toLocaleTimeString()} - ${text}\n`,
+    }))
+
+    moveTextareaCursorToEnd(textareaRef.current)
+  }
+
+  const {
+    mutateAsync,
+    isLoading: loadingSynchronization,
+  } = useForceSynchronization()
+
+  const initiateForcedSynchronization = (
+    evt: React.FormEvent<HTMLFormElement>
+  ) => {
+    evt.preventDefault()
+    if (!state.productIDToForceSynchronization) {
+      return
     }
-  };
-
-  const saveNostoConfiguration = (evt: React.FormEvent<HTMLFormElement>) => {
-    evt.preventDefault();
 
     setState((prevState) => ({
       ...prevState,
-      loggingText:
-        prevState.loggingText + `Nosto Configuration saved.\n`,
-    }));
+      productIDToForceSynchronization: '',
+    }))
 
-  };
+    logger(
+      `Started product id "${state.productIDToForceSynchronization}" forced synchronization...`,
+      '\n'
+    )
 
-  const saveAlgoliaConfiguration = (evt: React.FormEvent<HTMLFormElement>) => {
-    evt.preventDefault();
+    mutateAsync({
+      ProductId: state.productIDToForceSynchronization,
+    })
+      .then((response) => {
+        const { product } = response
+        const [firstSku] = product?.skus
+        const skusLength = product?.skus?.length ?? 0
+        const categories = Object.values(firstSku?.ProductCategories)
+        const catLength = categories?.length ?? 0
 
-    setState((prevState) => ({
-      ...prevState,
-      loggingText:
-        prevState.loggingText + `Algolia Configuration saved.\n`,
-    }));
+        logger(`Name: ${product?.Name}`)
+        logger(
+          `${skusLength} SKU${skusLength > 1 ? 's' : ''} found:\n${product?.skus
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ?.map((s: any) => s.Name)
+            .join('\n')}`
+        )
+        logger(
+          `Categor${catLength > 1 ? 'ies' : 'y'}: ${categories.join(' > ')}`
+        )
+        logger(`Best price: ${firstSku?.bestPriceFormated}`)
+        logger(
+          `Finished product id "${state.productIDToForceSynchronization}" forced synchronization...`
+        )
+      })
+      .catch(logger)
+      .finally(() => {
+        moveTextareaCursorToEnd(textareaRef.current)
+      })
+  }
 
-  };
+  const saveNostoConfiguration = () => {
+    logger('Nosto Configuration saved.', '\n')
+    moveTextareaCursorToEnd(textareaRef.current)
+  }
+
+  const saveAlgoliaConfiguration = () => {
+    logger('Algolia Configuration saved.', '\n')
+    moveTextareaCursorToEnd(textareaRef.current)
+  }
 
   return (
     <Layout
-      pageHeader={<PageHeader title={<FormattedMessage id="admin-catalogsynchronizer.hello-world" />} />}
+      pageHeader={
+        <PageHeader
+          title={
+            <FormattedMessage id="admin-catalogsynchronizer.hello-world" />
+          }
+        />
+      }
     >
       <PageBlock variation="full">
         <Card>
           <h3>Recent Logs</h3>
-          <Textarea disabled label="Events" value={state.loggingText}>
+          <Textarea
+            ref={textareaRef}
+            disabled
+            label="Events"
+            value={state.loggingText}
+            rows={16}
+          >
             Logging starts
           </Textarea>
+          <Button
+            variation="secondary"
+            size="small"
+            onClick={() =>
+              setState((prevState) => ({
+                ...prevState,
+                loggingText: DEFAULT_LOGGING_TEXT,
+              }))
+            }
+          >
+            Clear Logs
+          </Button>
         </Card>
         <Card>
           <h3>Force Product Synchronization</h3>
@@ -94,6 +190,7 @@ const AdminCatalogSynchronizer: FC = () => {
                 label="Product ID to force synchronization"
                 size="regular"
                 button="Synchronize Now"
+                isLoading={loadingSynchronization}
                 value={state.productIDToForceSynchronization}
                 onChange={updateProductIDToForceSynchronization}
               />
@@ -104,7 +201,11 @@ const AdminCatalogSynchronizer: FC = () => {
           <h3>Nosto Integration</h3>
           <div>
             <Toggle
-              label={state.nostoIntegrationEnabled ? 'Nosto Integration Activated' : 'Nosto Integration Deactivated'}
+              label={
+                state.nostoIntegrationEnabled
+                  ? 'Nosto Integration Activated'
+                  : 'Nosto Integration Deactivated'
+              }
               checked={state.nostoIntegrationEnabled}
               onChange={() =>
                 setState((prevState) => ({
@@ -128,7 +229,11 @@ const AdminCatalogSynchronizer: FC = () => {
               disabled={!state.nostoIntegrationEnabled}
             />
             <br />
-            <Button variation="primary" size="small" onClick={saveNostoConfiguration}>
+            <Button
+              variation="primary"
+              size="small"
+              onClick={saveNostoConfiguration}
+            >
               Save Nosto Configuration
             </Button>
           </div>
@@ -137,7 +242,11 @@ const AdminCatalogSynchronizer: FC = () => {
           <h3>Algolia Integration</h3>
           <div>
             <Toggle
-              label={state.algoliaIntegrationEnabled ? 'Algolia Integration Activated' : 'Algolia Integration Deactivated'}
+              label={
+                state.algoliaIntegrationEnabled
+                  ? 'Algolia Integration Activated'
+                  : 'Algolia Integration Deactivated'
+              }
               checked={state.algoliaIntegrationEnabled}
               onChange={() =>
                 setState((prevState) => ({
@@ -161,14 +270,18 @@ const AdminCatalogSynchronizer: FC = () => {
               disabled={!state.algoliaIntegrationEnabled}
             />
             <br />
-            <Button variation="primary" size="small" onClick={saveAlgoliaConfiguration}>
+            <Button
+              variation="primary"
+              size="small"
+              onClick={saveAlgoliaConfiguration}
+            >
               Save Algolia Configuration
             </Button>
           </div>
         </Card>
       </PageBlock>
     </Layout>
-  );
-};
+  )
+}
 
-export default AdminCatalogSynchronizer;
+export default withQueryProvider(AdminCatalogSynchronizer)

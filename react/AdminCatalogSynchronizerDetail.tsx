@@ -8,7 +8,9 @@ const AdminCatalogSynchronizerDetail: FC<Props> = ({ params }) => {
   return (
     <Layout
       pageHeader={
-        <PageHeader title={<FormattedMessage id="admin-catalogsynchronizer.details" />} />
+        <PageHeader
+          title={<FormattedMessage id="admin-catalogsynchronizer.details" />}
+        />
       }
     >
       <PageBlock variation="full">

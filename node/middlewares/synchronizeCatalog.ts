@@ -21,16 +21,20 @@ const synchronizeCatalog = async (context: ServiceContext<Clients>) => {
     throw new NotFoundError('IdSku or ProductId is required')
   }
 
+  const getFullSku = async (skuId: string) => {
+    const [singleSku, skuContext] = await Promise.all([
+      catalog.getSkuById(skuId),
+      catalog.getSkuContext(skuId),
+    ])
+
+    return { ...singleSku, ...skuContext }
+  }
+
   let sku
   let product
 
   if (IdSku) {
-    const [singleSku, skuContext] = await Promise.all([
-      catalog.getSkuById(IdSku),
-      catalog.getSkuContext(IdSku),
-    ])
-
-    sku = { ...singleSku, ...skuContext }
+    sku = await getFullSku(IdSku)
     customLog('SKU', sku)
   }
 
@@ -43,6 +47,17 @@ const synchronizeCatalog = async (context: ServiceContext<Clients>) => {
     ])
 
     product = { ...productWithSkus, ...singleProduct }
+
+    if (product.skus && product.skus.length > 0) {
+      product.skus = await Promise.all(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        product.skus.map(async (productSku: any) => {
+          const updatedSku = await getFullSku(productSku.sku)
+          return { ...productSku, ...updatedSku }
+        })
+      )
+    }
+
     customLog('Product', product)
   }
 

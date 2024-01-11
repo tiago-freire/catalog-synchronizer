@@ -17,6 +17,7 @@
     "vtex.styleguide": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.styleguide@9.146.9/public/@types/vtex.styleguide"
   },
   "dependencies": {
+    "@tanstack/react-query": "^4.33.0",
     "@types/faker": "^4.1.5",
     "faker": "^4.1.0"
   }
