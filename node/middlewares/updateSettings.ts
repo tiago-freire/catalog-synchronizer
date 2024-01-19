@@ -13,17 +13,19 @@ const updateSettings = async (context: ServiceContext<Clients, State>) => {
 
   log(`Settings payload: ${JSON.stringify(payload)}`, LogLevel.Info)
 
-  await apps.saveAppSettings(process.env.VTEX_APP_ID ?? '', {
+  const newSettings = {
     ...context.state.settings,
     ...payload,
-  })
+  }
+
+  await apps.saveAppSettings(process.env.VTEX_APP_ID ?? '', newSettings)
 
   context.set('Access-Control-Allow-Origin', '*')
   context.set('Access-Control-Allow-Headers', '*')
   context.set('Access-Control-Allow-Methods', '*')
   context.set('Access-Control-Allow-Credentials', 'true')
   context.set('Content-Type', 'application/json')
-  context.body = { ...payload }
+  context.body = newSettings
   context.status = 200
 }
 

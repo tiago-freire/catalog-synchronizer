@@ -10,6 +10,8 @@ type Response = ApiResponse & {
   sku?: any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   nostoProduct?: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  algoliaProduct?: any
 }
 
 type MutationArgs = {

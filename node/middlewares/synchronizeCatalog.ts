@@ -1,9 +1,15 @@
-import { LogLevel, NotFoundError, ServiceContext, log } from '@vtex/api'
+import {
+  ForbiddenError,
+  LogLevel,
+  NotFoundError,
+  ServiceContext,
+  log,
+} from '@vtex/api'
 import { json } from 'co-body'
 
 import { Clients } from '../clients'
 
-const synchronizeCatalog = async (context: ServiceContext<Clients>) => {
+const synchronizeCatalog = async (context: ServiceContext<Clients, State>) => {
   const {
     req,
     clients: {
@@ -13,11 +19,18 @@ const synchronizeCatalog = async (context: ServiceContext<Clients>) => {
       productClient,
       productWithSkusClient,
     },
+    state: {
+      settings: { nostoIntegrationEnabled, algoliaIntegrationEnabled },
+    },
   } = context
+
+  if (!nostoIntegrationEnabled && !algoliaIntegrationEnabled) {
+    throw new ForbiddenError('No integration is enabled')
+  }
 
   const payload = await json(req)
 
-  log(`Catalog notification payload: ${JSON.stringify(payload)}`, LogLevel.Info)
+  log(`Syncronize catalog payload: ${JSON.stringify(payload)}`, LogLevel.Info)
 
   const { ProductId, IdSku } = payload
 
@@ -61,16 +74,25 @@ const synchronizeCatalog = async (context: ServiceContext<Clients>) => {
     }
   }
 
-  const { currencyCode } = await segment.getSegment()
-  const nostoProduct = nostoClient.converter({ product, sku, currencyCode })
-  await nostoClient.updateProduct(nostoProduct)
+  let nostoProduct
+  let algoliaProduct
+
+  if (nostoIntegrationEnabled) {
+    const { currencyCode } = await segment.getSegment()
+    nostoProduct = nostoClient.converter({ product, sku, currencyCode })
+    await nostoClient.updateProduct(nostoProduct)
+  }
+
+  if (algoliaIntegrationEnabled) {
+    // TODO: Implement algolia synchronization
+  }
 
   context.set('Access-Control-Allow-Origin', '*')
   context.set('Access-Control-Allow-Headers', '*')
   context.set('Access-Control-Allow-Methods', '*')
   context.set('Access-Control-Allow-Credentials', 'true')
   context.set('Content-Type', 'application/json')
-  context.body = { product, sku, nostoProduct }
+  context.body = { product, sku, nostoProduct, algoliaProduct }
   context.status = 200
 }
 
