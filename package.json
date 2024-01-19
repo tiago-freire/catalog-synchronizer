@@ -1,5 +1,5 @@
 {
-  "name": "admin-catalogsynchronizer",
+  "name": "catalog-synchronizer",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {

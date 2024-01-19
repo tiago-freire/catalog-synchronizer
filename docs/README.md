@@ -1,4 +1,4 @@
-# Catalog Synchronizer Admin (Prototype)
+# Catalog Synchronizer
 
 _This App is for demonstration purposes only. DO NOT USE IT IN A PRODUCTION ENVIRONMENT. It has not been tested in high volume situations and has not been properly secured._
 
@@ -9,7 +9,7 @@ When a catalog change notification is received, the App will forward to a third 
 
 ### Quickstart
 
-1. Install the App using `vtex install ssesandbox04.catalog-synchronizer-admin-prototype@0.0.1`
+1. Install the App using `vtex install ssesandbox04.catalog-synchronizer@0.x`
 
 2. Configure the Affiliate as described in https://help.vtex.com/en/tutorial/configuring-affiliates--tutorials_187 or by accessing the link /admin/checkout/#/affiliates in your admin instance. Instead of `https://{endpointDoAfiliado}/api/notification/`, use `https://{{workspace}}--{{account}}.myvtex.com/_v/catalogsynchronizer/`
 

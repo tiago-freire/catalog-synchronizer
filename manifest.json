@@ -1,8 +1,8 @@
 {
-  "name": "catalog-synchronizer-admin-prototype",
+  "name": "catalog-synchronizer",
   "vendor": "ssesandbox04",
-  "version": "0.0.1",
-  "title": "Catalog Synchronizer Admin (Prototype)",
+  "version": "0.0.0",
+  "title": "Catalog Synchronizer",
   "description": "Catalog Synchronizer captures product changes through an EndPoint that receives Affiliate Notifications. Received notifications trigger Catalog changes synchronization to third-party systems such as Nosto or Algolia.",
   "dependencies": {
     "vtex.styleguide": "9.x"
