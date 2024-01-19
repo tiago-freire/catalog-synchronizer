@@ -1,8 +1,19 @@
-import type { Cached, ClientsConfig } from '@vtex/api'
+import type { Cached, ClientsConfig, Maybe, RecorderState } from '@vtex/api'
 import { LRUCache, Service, method } from '@vtex/api'
 
 import { Clients } from './clients'
+import getSettings from './middlewares/getSettings'
+import responseSettings from './middlewares/responseSettings'
 import synchronizeCatalog from './middlewares/synchronizeCatalog'
+import updateSettings from './middlewares/updateSettings'
+
+declare global {
+  type Settings = Record<string, Maybe<string | boolean>>
+
+  type State = RecorderState & {
+    settings: Record<string, Maybe<string | boolean>>
+  }
+}
 
 const TIMEOUT_MS = 4 * 1000
 const CONCURRENCY = 10
@@ -26,8 +37,8 @@ const clients: ClientsConfig<Clients> = {
 export default new Service({
   clients,
   routes: {
-    catalogSynchronizer: method({
-      POST: synchronizeCatalog,
-    }),
+    catalogSynchronizer: method({ POST: [getSettings, synchronizeCatalog] }),
+    getSettings: method({ GET: [getSettings, responseSettings] }),
+    updateSettings: method({ POST: [getSettings, updateSettings] }),
   },
 })

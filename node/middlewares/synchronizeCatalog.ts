@@ -3,17 +3,21 @@ import { json } from 'co-body'
 
 import { Clients } from '../clients'
 
-const customLog = (title: string, object: unknown) =>
-  log(`${title}: ${JSON.stringify(object, null, 2)}`, LogLevel.Info)
-
 const synchronizeCatalog = async (context: ServiceContext<Clients>) => {
   const {
     req,
-    clients: { catalog, productClient, productWithSkusClient },
+    clients: {
+      catalog,
+      segment,
+      nostoClient,
+      productClient,
+      productWithSkusClient,
+    },
   } = context
 
   const payload = await json(req)
-  customLog('Catalog notification payload', payload)
+
+  log(`Catalog notification payload: ${JSON.stringify(payload)}`, LogLevel.Info)
 
   const { ProductId, IdSku } = payload
 
@@ -35,7 +39,6 @@ const synchronizeCatalog = async (context: ServiceContext<Clients>) => {
 
   if (IdSku) {
     sku = await getFullSku(IdSku)
-    customLog('SKU', sku)
   }
 
   const idProduct = ProductId || sku?.ProductId
@@ -50,24 +53,24 @@ const synchronizeCatalog = async (context: ServiceContext<Clients>) => {
 
     if (product.skus && product.skus.length > 0) {
       product.skus = await Promise.all(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        product.skus.map(async (productSku: any) => {
+        product.skus.map(async (productSku: { sku: string }) => {
           const updatedSku = await getFullSku(productSku.sku)
           return { ...productSku, ...updatedSku }
         })
       )
     }
-
-    customLog('Product', product)
   }
+
+  const { currencyCode } = await segment.getSegment()
+  const nostoProduct = nostoClient.converter({ product, sku, currencyCode })
+  await nostoClient.updateProduct(nostoProduct)
 
   context.set('Access-Control-Allow-Origin', '*')
   context.set('Access-Control-Allow-Headers', '*')
   context.set('Access-Control-Allow-Methods', '*')
   context.set('Access-Control-Allow-Credentials', 'true')
   context.set('Content-Type', 'application/json')
-
-  context.body = { product, sku }
+  context.body = { product, sku, nostoProduct }
   context.status = 200
 }
 

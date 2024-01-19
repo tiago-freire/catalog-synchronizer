@@ -20,6 +20,26 @@
           "actions": ["post", "options"]
         }
       ]
+    },
+    "getSettings": {
+      "path": "/_v/catalogsynchronizer/get-settings",
+      "public": true,
+      "policies": [
+        {
+          "effect": "allow",
+          "actions": ["get", "post", "options"]
+        }
+      ]
+    },
+    "updateSettings": {
+      "path": "/_v/catalogsynchronizer/update-settings",
+      "public": true,
+      "policies": [
+        {
+          "effect": "allow",
+          "actions": ["post", "options"]
+        }
+      ]
     }
   }
 }

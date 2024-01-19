@@ -22,6 +22,9 @@
       "name": "colossus-write-logs"
     },
     {
+      "name": "update-app-settings"
+    },
+    {
       "name": "ADMIN_DS"
     },
     {
@@ -70,6 +73,13 @@
       }
     },
     {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "api.nosto.com",
+        "path": "/v1/*"
+      }
+    },
+    {
       "name": "Sku.aspx"
     },
     {
@@ -98,5 +108,35 @@
       "name": "vbase-read-write"
     }
   ],
+  "settingsSchema": {
+    "title": "Google Sheets API Settings",
+    "type": "object",
+    "properties": {
+      "nostoIntegrationEnabled": {
+        "title": "Enable Nosto integration",
+        "type": "boolean"
+      },
+      "nostoAccountID": {
+        "title": "Nosto Account ID",
+        "type": "string"
+      },
+      "nostoToken": {
+        "title": "Nosto API Token",
+        "type": "string"
+      },
+      "algoliaIntegrationEnabled": {
+        "title": "Enable Algolia integration",
+        "type": "boolean"
+      },
+      "algoliaApplicationID": {
+        "title": "Algolia Application ID",
+        "type": "string"
+      },
+      "algoliaAPIKey": {
+        "title": "Algolia API Key",
+        "type": "string"
+      }
+    }
+  },
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
 }

@@ -5,7 +5,15 @@ import React from 'react'
 export type ApiResponse = {
   code?: string
   message?: string
-  response?: { data?: string | { error?: string } }
+  response?: {
+    data?:
+      | string
+      | {
+          errors?: Array<{ errors?: string }>
+          message?: string
+          error?: string
+        }
+  }
 }
 
 const MAX_RETRIES = 10
@@ -54,7 +62,9 @@ export const apiRequestFactory = <R extends ApiResponse, B = unknown>(
     if (!response.ok) {
       throw new Error(
         typeof json?.response?.data === 'object'
-          ? json?.response?.data?.error
+          ? json?.response?.data?.errors?.[0]?.errors ??
+            json?.response?.data?.error ??
+            json?.response?.data?.message
           : json?.response?.data?.length
           ? json?.response?.data
           : json?.message ?? json?.code ?? response.status.toString()
@@ -66,3 +76,4 @@ export const apiRequestFactory = <R extends ApiResponse, B = unknown>(
 }
 
 export * from './useForceSynchronization'
+export * from './useSettings'

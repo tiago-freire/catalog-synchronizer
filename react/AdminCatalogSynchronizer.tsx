@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
 import {
   Button,
@@ -12,7 +12,12 @@ import {
   Toggle,
 } from 'vtex.styleguide'
 
-import { useForceSynchronization, withQueryProvider } from './services'
+import {
+  useForceSynchronization,
+  useSettings,
+  withQueryProvider,
+} from './services'
+
 import './styles.global.css'
 
 const moveTextareaCursorToEnd = (textarea?: HTMLTextAreaElement) => {
@@ -27,8 +32,16 @@ const moveTextareaCursorToEnd = (textarea?: HTMLTextAreaElement) => {
 const DEFAULT_LOGGING_TEXT = 'logging starts here...\n'
 
 const AdminCatalogSynchronizer: FC = () => {
+  const {
+    getSettings: { data: settings, isLoading: loadingGetSettings },
+    mutationUpdateSettings: {
+      mutateAsync: updateSettings,
+      isLoading: loadingUpdateSettings,
+    },
+  } = useSettings()
+
   const [state, setState] = useState({
-    nostoIntegrationEnabled: true,
+    nostoIntegrationEnabled: false,
     nostoAccountID: '',
     nostoToken: '',
     algoliaIntegrationEnabled: false,
@@ -38,8 +51,23 @@ const AdminCatalogSynchronizer: FC = () => {
     loggingText: DEFAULT_LOGGING_TEXT,
   })
 
+  useEffect(() => {
+    if (settings && !loadingGetSettings) {
+      setState((prevState) => ({
+        ...prevState,
+        nostoIntegrationEnabled: settings.nostoIntegrationEnabled ?? false,
+        nostoAccountID: settings.nostoAccountID ?? '',
+        nostoToken: settings.nostoToken ?? '',
+        algoliaIntegrationEnabled: settings.algoliaIntegrationEnabled ?? false,
+        algoliaApplicationID: settings.algoliaApplicationID ?? '',
+        algoliaAPIKey: settings.algoliaAPIKey ?? '',
+      }))
+    }
+  }, [loadingGetSettings, settings])
+
   const updateNostoAccountID = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
+
     setState((prevState) => ({ ...prevState, nostoAccountID: value }))
   }
 
@@ -84,7 +112,7 @@ const AdminCatalogSynchronizer: FC = () => {
   }
 
   const {
-    mutateAsync,
+    mutateAsync: forceSynchronization,
     isLoading: loadingSynchronization,
   } = useForceSynchronization()
 
@@ -106,45 +134,47 @@ const AdminCatalogSynchronizer: FC = () => {
       '\n'
     )
 
-    mutateAsync({
+    forceSynchronization({
       ProductId: state.productIDToForceSynchronization,
     })
       .then((response) => {
-        const { product } = response
-        const [firstSku] = product?.skus
-        const skusLength = product?.skus?.length ?? 0
-        const categories = Object.values(firstSku?.ProductCategories)
-        const catLength = categories?.length ?? 0
-
-        logger(`Name: ${product?.Name}`)
         logger(
-          `${skusLength} SKU${skusLength > 1 ? 's' : ''} found:\n${product?.skus
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ?.map((s: any) => s.Name)
-            .join('\n')}`
+          `Product updated at Nosto: ${JSON.stringify(response.nostoProduct)}`
         )
         logger(
-          `Categor${catLength > 1 ? 'ies' : 'y'}: ${categories.join(' > ')}`
-        )
-        logger(`Best price: ${firstSku?.bestPriceFormated}`)
-        logger(
-          `Finished product id "${state.productIDToForceSynchronization}" forced synchronization...`
+          `Finished product id "${state.productIDToForceSynchronization}" forced synchronization successfully...`
         )
       })
-      .catch(logger)
-      .finally(() => {
-        moveTextareaCursorToEnd(textareaRef.current)
+      .catch((e) => {
+        logger(
+          `Finished product id "${state.productIDToForceSynchronization}" forced synchronization with errors!`
+        )
+        logger(e)
       })
   }
 
   const saveNostoConfiguration = () => {
-    logger('Nosto Configuration saved.', '\n')
-    moveTextareaCursorToEnd(textareaRef.current)
+    updateSettings({
+      nostoIntegrationEnabled: state.nostoIntegrationEnabled,
+      nostoAccountID: state.nostoAccountID,
+      nostoToken: state.nostoToken,
+    })
+      .then(() => {
+        logger('Nosto Configuration saved.', '\n')
+      })
+      .catch(logger)
   }
 
   const saveAlgoliaConfiguration = () => {
-    logger('Algolia Configuration saved.', '\n')
-    moveTextareaCursorToEnd(textareaRef.current)
+    updateSettings({
+      algoliaIntegrationEnabled: state.algoliaIntegrationEnabled,
+      algoliaAPIKey: state.algoliaAPIKey,
+      algoliaApplicationID: state.algoliaApplicationID,
+    })
+      .then(() => {
+        logger('Algolia Configuration saved.', '\n')
+      })
+      .catch(logger)
   }
 
   return (
@@ -213,26 +243,30 @@ const AdminCatalogSynchronizer: FC = () => {
                   nostoIntegrationEnabled: !prevState.nostoIntegrationEnabled,
                 }))
               }
+              disabled={loadingGetSettings}
             />
             <br />
             <Input
               label="Nosto Account ID"
               value={state.nostoAccountID}
               onChange={updateNostoAccountID}
-              disabled={!state.nostoIntegrationEnabled}
+              placeholder={loadingGetSettings ? 'Loading...' : ''}
+              disabled={!state.nostoIntegrationEnabled || loadingGetSettings}
             />
             <br />
             <Input
               label="Nosto API Token"
               value={state.nostoToken}
               onChange={updateNostoToken}
-              disabled={!state.nostoIntegrationEnabled}
+              placeholder={loadingGetSettings ? 'Loading...' : ''}
+              disabled={!state.nostoIntegrationEnabled || loadingGetSettings}
             />
             <br />
             <Button
               variation="primary"
               size="small"
               onClick={saveNostoConfiguration}
+              isLoading={loadingGetSettings || loadingUpdateSettings}
             >
               Save Nosto Configuration
             </Button>
@@ -254,26 +288,30 @@ const AdminCatalogSynchronizer: FC = () => {
                   algoliaIntegrationEnabled: !prevState.algoliaIntegrationEnabled,
                 }))
               }
+              disabled={loadingGetSettings}
             />
             <br />
             <Input
               label="Algolia Application ID"
               value={state.algoliaApplicationID}
               onChange={updateAlgoliaApplicationID}
-              disabled={!state.algoliaIntegrationEnabled}
+              placeholder={loadingGetSettings ? 'Loading...' : ''}
+              disabled={!state.algoliaIntegrationEnabled || loadingGetSettings}
             />
             <br />
             <Input
               label="Algolia API Key"
               value={state.algoliaAPIKey}
               onChange={updateAlgoliaAPIKey}
-              disabled={!state.algoliaIntegrationEnabled}
+              placeholder={loadingGetSettings ? 'Loading...' : ''}
+              disabled={!state.algoliaIntegrationEnabled || loadingGetSettings}
             />
             <br />
             <Button
               variation="primary"
               size="small"
               onClick={saveAlgoliaConfiguration}
+              isLoading={loadingGetSettings || loadingUpdateSettings}
             >
               Save Algolia Configuration
             </Button>
