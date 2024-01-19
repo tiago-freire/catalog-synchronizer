@@ -109,7 +109,7 @@
     }
   ],
   "settingsSchema": {
-    "title": "Google Sheets API Settings",
+    "title": "Catalog Synchronizer Settings",
     "type": "object",
     "properties": {
       "nostoIntegrationEnabled": {
