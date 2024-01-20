@@ -7,7 +7,7 @@ export default class NostoClient extends ExternalClient {
   private nostoToken = ''
 
   constructor(context: IOContext, options?: InstanceOptions) {
-    super('http://api.nosto.com/v1', context, options)
+    super('https://api.nosto.com/v1', context, options)
   }
 
   public setNostoToken(token: string) {

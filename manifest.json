@@ -76,7 +76,7 @@
       "name": "outbound-access",
       "attrs": {
         "host": "api.nosto.com",
-        "path": "/v1/*"
+        "path": "/v1/products/upsert"
       }
     },
     {
