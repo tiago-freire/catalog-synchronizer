@@ -1,3 +1,5 @@
+[![Publish and Deploy App](https://github.com/tiago-freire/catalog-synchronizer/actions/workflows/publish-and-deploy.yml/badge.svg)](https://github.com/tiago-freire/catalog-synchronizer/actions/workflows/publish-and-deploy.yml)
+
 # Catalog Synchronizer
 
 _This App is for demonstration purposes only. DO NOT USE IT IN A PRODUCTION ENVIRONMENT. It has not been tested in high volume situations and has not been properly secured._
