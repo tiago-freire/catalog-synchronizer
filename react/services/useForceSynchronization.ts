@@ -25,7 +25,7 @@ export const useForceSynchronization = () => {
     mutationKey: ['forceSynchronization', workspace],
     mutationFn: async ({ ProductId }: MutationArgs) =>
       apiRequestFactory<Response>(
-        `/_v/catalogsynchronizer?workspace=${workspace}`,
+        `/_v/private/catalogsynchronizer?workspace=${workspace}`,
         'POST',
         { ProductId }
       )(),

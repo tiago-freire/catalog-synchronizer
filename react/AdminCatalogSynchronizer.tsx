@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react'
-import { FormattedMessage } from 'react-intl'
+import { useIntl } from 'react-intl'
 import {
   Button,
   Card,
@@ -32,6 +32,8 @@ const moveTextareaCursorToEnd = (textarea?: HTMLTextAreaElement) => {
 const DEFAULT_LOGGING_TEXT = 'logging starts here...\n'
 
 const AdminCatalogSynchronizer: FC = () => {
+  const { formatMessage } = useIntl()
+
   const {
     getSettings: { data: settings, isLoading: loadingGetSettings },
     mutationUpdateSettings: {
@@ -192,9 +194,9 @@ const AdminCatalogSynchronizer: FC = () => {
     <Layout
       pageHeader={
         <PageHeader
-          title={
-            <FormattedMessage id="admin-catalogsynchronizer.hello-world" />
-          }
+          title={`${formatMessage({
+            id: 'admin-catalogsynchronizer.hello-world',
+          })} v${process.env.VTEX_APP_VERSION}`}
         />
       }
     >

@@ -12,7 +12,7 @@
   "workers": 1,
   "routes": {
     "catalogSynchronizer": {
-      "path": "/_v/catalogsynchronizer",
+      "path": "/_v/private/catalogsynchronizer",
       "public": true,
       "policies": [
         {
@@ -22,7 +22,7 @@
       ]
     },
     "getSettings": {
-      "path": "/_v/catalogsynchronizer/get-settings",
+      "path": "/_v/private/catalogsynchronizer/get-settings",
       "public": true,
       "policies": [
         {
@@ -32,7 +32,7 @@
       ]
     },
     "updateSettings": {
-      "path": "/_v/catalogsynchronizer/update-settings",
+      "path": "/_v/private/catalogsynchronizer/update-settings",
       "public": true,
       "policies": [
         {

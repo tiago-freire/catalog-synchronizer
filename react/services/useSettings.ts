@@ -20,7 +20,7 @@ export const useSettings = () => {
   const getSettings = useQuery({
     queryKey: ['settings', workspace],
     queryFn: apiRequestFactory<Response>(
-      `/_v/catalogsynchronizer/get-settings?workspace=${workspace}`
+      `/_v/private/catalogsynchronizer/get-settings?workspace=${workspace}`
     ),
   })
 
@@ -28,7 +28,7 @@ export const useSettings = () => {
     mutationKey: ['settings', workspace],
     mutationFn: async (settings: Settings) =>
       apiRequestFactory<Response>(
-        `/_v/catalogsynchronizer/update-settings?workspace=${workspace}`,
+        `/_v/private/catalogsynchronizer/update-settings?workspace=${workspace}`,
         'POST',
         settings
       )(),
