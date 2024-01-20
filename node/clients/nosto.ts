@@ -52,7 +52,10 @@ export default class NostoClient extends ExternalClient {
 
   public updateProduct(nostoProduct: unknown) {
     return this.http.post('/products/upsert', [nostoProduct], {
-      headers: { Authorization: `Basic ${btoa(`:${this.nostoToken}`)}` },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${btoa(`:${this.nostoToken}`)}`,
+      },
     })
   }
 }

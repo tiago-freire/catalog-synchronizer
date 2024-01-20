@@ -11,7 +11,7 @@ declare global {
   type Settings = Record<string, Maybe<string | boolean>>
 
   type State = RecorderState & {
-    settings: Record<string, Maybe<string | boolean>>
+    settings: Settings
   }
 }
 
