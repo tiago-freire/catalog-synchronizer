@@ -7,7 +7,15 @@ export default class NostoClient extends ExternalClient {
   private nostoToken = ''
 
   constructor(context: IOContext, options?: InstanceOptions) {
-    super('https://api.nosto.com/v1', context, options)
+    super('https://api.nosto.com/v1', context, {
+      ...options,
+      headers: {
+        ...options?.headers,
+        'Content-Type': 'application/json',
+        'X-VTEX-Use-Https': 'true',
+        'Proxy-Authorization': context.authToken,
+      },
+    })
   }
 
   public setNostoToken(token: string) {
@@ -53,7 +61,7 @@ export default class NostoClient extends ExternalClient {
   public updateProduct(nostoProduct: unknown) {
     return this.http.post('/products/upsert', [nostoProduct], {
       headers: {
-        'Content-Type': 'application/json',
+        ...this.options?.headers,
         Authorization: `Basic ${btoa(`:${this.nostoToken}`)}`,
       },
     })
