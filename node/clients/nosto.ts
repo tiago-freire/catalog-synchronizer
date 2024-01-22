@@ -14,6 +14,7 @@ export default class NostoClient extends ExternalClient {
         'Content-Type': 'application/json',
         'X-VTEX-Use-Https': 'true',
         'Proxy-Authorization': context.authToken,
+        VtexIdclientAutcookie: context.authToken,
       },
     })
   }
