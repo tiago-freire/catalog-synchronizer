@@ -13,7 +13,7 @@ When a catalog change notification is received, the App will forward to a third 
 
 1. Install the App using `vtex install ssesandbox04.catalog-synchronizer@0.x`
 
-2. Configure the Affiliate as described in https://help.vtex.com/en/tutorial/configuring-affiliates--tutorials_187 or by accessing the link /admin/checkout/#/affiliates in your admin instance. Instead of `https://{endpointDoAfiliado}/api/notification/`, use `https://{{workspace}}--{{account}}.myvtex.com/_v/catalogsynchronizer/`
+2. Configure the Affiliate as described in https://help.vtex.com/en/tutorial/configuring-affiliates--tutorials_187 or by accessing the link /admin/checkout/#/affiliates in your admin instance. Instead of `https://{endpointDoAfiliado}/api/notification/`, use `https://{{workspace}}--{{account}}.myvtex.com/_v/private/catalogsynchronizer/`
 
 3. Access the `https://{{workspace}}--{{account}}.myvtex.com/admin/catalogsynchronizer/` and follow the instructions on the screen.
 
