@@ -12,7 +12,7 @@ export default class NostoClient extends ExternalClient {
       headers: {
         ...options?.headers,
         'Content-Type': 'application/json',
-        'X-VTEX-Use-Https': 'true',
+        'X-Vtex-Use-Https': 'true',
         'Proxy-Authorization': context.authToken,
         VtexIdclientAutcookie: context.authToken,
       },
@@ -59,12 +59,18 @@ export default class NostoClient extends ExternalClient {
     }
   }
 
-  public updateProduct(nostoProduct: unknown) {
-    return this.http.post('/products/upsert', [nostoProduct], {
-      headers: {
-        ...this.options?.headers,
-        Authorization: `Basic ${btoa(`:${this.nostoToken}`)}`,
-      },
-    })
+  public async updateProduct(nostoProduct: unknown) {
+    const response = await this.http.postRaw(
+      '/products/upsert',
+      [nostoProduct],
+      {
+        headers: {
+          ...this.options?.headers,
+          Authorization: `Basic ${btoa(`:${this.nostoToken}`)}`,
+        },
+      }
+    )
+
+    return response.data
   }
 }

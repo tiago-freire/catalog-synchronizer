@@ -75,19 +75,21 @@ const synchronizeCatalog = async (context: ServiceContext<Clients, State>) => {
   }
 
   let nostoProduct
+  let nostoResponse
   let algoliaProduct
+  let algoliaResponse
 
   // Nosto synchronization
   if (nostoIntegrationEnabled) {
     const { currencyCode } = await segment.getSegment()
     nostoProduct = nostoClient.converter({ product, sku, currencyCode })
-    await nostoClient.updateProduct(nostoProduct)
+    nostoResponse = await nostoClient.updateProduct(nostoProduct)
   }
 
   // TODO: Implement algolia synchronization
   // if (algoliaIntegrationEnabled) {
   //   algoliaProduct = algoliaClient.converter({ product, sku, currencyCode })
-  //   await algoliaClient.updateProduct(algoliaProduct)
+  //   algoliaResponse =await algoliaClient.updateProduct(algoliaProduct)
   // }
 
   context.set('Access-Control-Allow-Origin', '*')
@@ -95,7 +97,14 @@ const synchronizeCatalog = async (context: ServiceContext<Clients, State>) => {
   context.set('Access-Control-Allow-Methods', '*')
   context.set('Access-Control-Allow-Credentials', 'true')
   context.set('Content-Type', 'application/json')
-  context.body = { product, sku, nostoProduct, algoliaProduct }
+  context.body = {
+    product,
+    sku,
+    nostoProduct,
+    nostoResponse,
+    algoliaProduct,
+    algoliaResponse,
+  }
   context.status = 200
 }
 

@@ -4,14 +4,12 @@ import { useRuntime } from 'vtex.render-runtime'
 import { ApiResponse, apiRequestFactory } from '.'
 
 type Response = ApiResponse & {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  product?: any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  sku?: any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  nostoProduct?: any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  algoliaProduct?: any
+  product?: unknown
+  sku?: unknown
+  nostoProduct?: unknown
+  nostoResponse?: unknown
+  algoliaProduct?: unknown
+  algoliaResponse?: unknown
 }
 
 type MutationArgs = {

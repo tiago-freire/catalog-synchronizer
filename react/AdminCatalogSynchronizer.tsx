@@ -144,6 +144,7 @@ const AdminCatalogSynchronizer: FC = () => {
           logger(
             `Product updated at Nosto: ${JSON.stringify(response.nostoProduct)}`
           )
+          logger(`Nosto response: ${JSON.stringify(response.nostoResponse)}`)
         }
 
         if (response.algoliaProduct) {
@@ -152,10 +153,13 @@ const AdminCatalogSynchronizer: FC = () => {
               response.algoliaProduct
             )}`
           )
+          logger(
+            `Algolia response: ${JSON.stringify(response.algoliaResponse)}`
+          )
         }
 
         logger(
-          `Finished product id "${state.productIDToForceSynchronization}" forced synchronization successfully...`
+          `Finished product id "${state.productIDToForceSynchronization}" forced synchronization successfully!`
         )
       })
       .catch((e) => {
