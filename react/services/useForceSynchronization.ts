@@ -10,6 +10,7 @@ type Response = ApiResponse & {
   nostoResponse?: unknown
   algoliaProduct?: unknown
   algoliaResponse?: unknown
+  errors?: string[]
 }
 
 type MutationArgs = {
@@ -22,11 +23,11 @@ export const useForceSynchronization = () => {
   const mutationForceSynchronization = useMutation({
     mutationKey: ['forceSynchronization', workspace],
     mutationFn: async ({ ProductId }: MutationArgs) =>
-      apiRequestFactory<Response>(
-        `/_v/private/catalogsynchronizer?workspace=${workspace}`,
-        'POST',
-        { ProductId }
-      )(),
+      apiRequestFactory<Response>({
+        url: `/_v/private/catalogsynchronizer?workspace=${workspace}`,
+        method: 'POST',
+        body: { ProductId },
+      })(),
   })
 
   return mutationForceSynchronization

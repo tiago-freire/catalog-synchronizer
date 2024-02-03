@@ -19,19 +19,19 @@ export const useSettings = () => {
 
   const getSettings = useQuery({
     queryKey: ['settings', workspace],
-    queryFn: apiRequestFactory<Response>(
-      `/_v/private/catalogsynchronizer/get-settings?workspace=${workspace}`
-    ),
+    queryFn: apiRequestFactory<Response>({
+      url: `/_v/private/catalogsynchronizer/get-settings?workspace=${workspace}`,
+    }),
   })
 
   const mutationUpdateSettings = useMutation({
     mutationKey: ['settings', workspace],
     mutationFn: async (settings: Settings) =>
-      apiRequestFactory<Response>(
-        `/_v/private/catalogsynchronizer/update-settings?workspace=${workspace}`,
-        'POST',
-        settings
-      )(),
+      apiRequestFactory<Response>({
+        url: `/_v/private/catalogsynchronizer/update-settings?workspace=${workspace}`,
+        method: 'POST',
+        body: settings,
+      })(),
   })
 
   return { getSettings, mutationUpdateSettings }

@@ -16,6 +16,7 @@ const synchronizeCatalog = async (context: ServiceContext<Clients, State>) => {
       catalog,
       segment,
       nostoClient,
+      algoliaClient,
       productClient,
       productWithSkusClient,
     },
@@ -74,23 +75,34 @@ const synchronizeCatalog = async (context: ServiceContext<Clients, State>) => {
     }
   }
 
+  const { currencyCode } = await segment.getSegment()
+  const apiProduct = nostoClient.converter({ product, sku, currencyCode })
+
   let nostoProduct
   let nostoResponse
   let algoliaProduct
   let algoliaResponse
+  const errors: string[] = []
 
   // Nosto synchronization
   if (nostoIntegrationEnabled) {
-    const { currencyCode } = await segment.getSegment()
-    nostoProduct = nostoClient.converter({ product, sku, currencyCode })
-    nostoResponse = await nostoClient.updateProduct(nostoProduct)
+    nostoProduct = { ...apiProduct }
+    nostoResponse = await nostoClient
+      .updateProduct(nostoProduct)
+      .catch((error) => {
+        errors.push(error.message)
+      })
   }
 
-  // TODO: Implement algolia synchronization
-  // if (algoliaIntegrationEnabled) {
-  //   algoliaProduct = algoliaClient.converter({ product, sku, currencyCode })
-  //   algoliaResponse =await algoliaClient.updateProduct(algoliaProduct)
-  // }
+  // Algolia synchronization
+  if (algoliaIntegrationEnabled) {
+    algoliaProduct = { ...apiProduct, objectID: apiProduct.product_id }
+    algoliaResponse = await algoliaClient
+      .updateProduct(algoliaProduct)
+      .catch((error) => {
+        errors.push(error.message)
+      })
+  }
 
   context.set('Access-Control-Allow-Origin', '*')
   context.set('Access-Control-Allow-Headers', '*')
@@ -104,6 +116,7 @@ const synchronizeCatalog = async (context: ServiceContext<Clients, State>) => {
     nostoResponse,
     algoliaProduct,
     algoliaResponse,
+    errors,
   }
   context.status = 200
 }

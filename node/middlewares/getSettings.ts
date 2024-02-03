@@ -7,7 +7,7 @@ const getSettings = async (
   next: () => Promise<void>
 ) => {
   const {
-    clients: { apps, nostoClient },
+    clients: { apps, nostoClient, algoliaClient },
   } = context
 
   const appSettings: Settings = await apps.getAppSettings(
@@ -17,7 +17,10 @@ const getSettings = async (
   log(`Settings: ${JSON.stringify(appSettings)}`, LogLevel.Info)
 
   nostoClient.setNostoToken(appSettings?.nostoToken as string)
-  // TODO: algoliaClient.setApiKey(appSettings?.algoliaAPIKey as string)
+  algoliaClient.setAuthentication(
+    appSettings?.algoliaApplicationID as string,
+    appSettings?.algoliaAPIKey as string
+  )
 
   context.state.settings = { ...appSettings }
 

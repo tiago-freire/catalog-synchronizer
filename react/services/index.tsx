@@ -50,13 +50,23 @@ export function withQueryProvider<P>(Component?: FC<P>) {
   return WrappedComponent
 }
 
-export const apiRequestFactory = <R extends ApiResponse, B = unknown>(
-  url: string,
-  method = 'GET',
+export const apiRequestFactory = <R extends ApiResponse, B = unknown>({
+  url,
+  method,
+  body,
+  headers,
+}: {
+  url: string
+  method?: string
   body?: B
-) => {
+  headers?: HeadersInit
+}) => {
   return async () => {
-    const response = await fetch(url, { method, body: JSON.stringify(body) })
+    const response = await fetch(url, {
+      method,
+      body: JSON.stringify(body),
+      headers,
+    })
     const json: R = await response.json()
 
     if (!response.ok) {
