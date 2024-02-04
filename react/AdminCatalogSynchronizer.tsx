@@ -113,6 +113,11 @@ const AdminCatalogSynchronizer: FC = () => {
     moveTextareaCursorToEnd(textareaRef.current)
   }
 
+  const logError = () =>
+    logger(
+      `Finished product id "${state.productIDToForceSynchronization}" forced synchronization with errors!`
+    )
+
   const {
     mutateAsync: forceSynchronization,
     isLoading: loadingSynchronization,
@@ -158,18 +163,28 @@ const AdminCatalogSynchronizer: FC = () => {
           )
         }
 
-        if (response.errors?.length) {
-          logger(`Errors: ${JSON.stringify(response.errors)}`)
+        if (response.nostoError) {
+          logger(`Error at Nosto synchronization: ${response.nostoError}`)
         }
 
-        logger(
-          `Finished product id "${state.productIDToForceSynchronization}" forced synchronization successfully!`
-        )
+        if (response.algoliaError) {
+          logger(`Error at Algolia synchronization: ${response.algoliaError}`)
+        }
+
+        if (!response.nostoError && !response.algoliaError) {
+          logger(
+            `Finished product id "${state.productIDToForceSynchronization}" forced synchronization successfully!`
+          )
+        } else if (response.nostoError && response.algoliaError) {
+          logError()
+        } else {
+          logger(
+            `Finished product id "${state.productIDToForceSynchronization}" forced synchronization partially successfully!`
+          )
+        }
       })
       .catch((e) => {
-        logger(
-          `Finished product id "${state.productIDToForceSynchronization}" forced synchronization with errors!`
-        )
+        logError()
         logger(e)
       })
   }
@@ -241,7 +256,23 @@ const AdminCatalogSynchronizer: FC = () => {
                 label="Product ID to force synchronization"
                 size="regular"
                 button="Synchronize Now"
-                isLoading={loadingSynchronization}
+                isLoading={
+                  loadingSynchronization ||
+                  loadingGetSettings ||
+                  loadingUpdateSettings
+                }
+                placeholder={
+                  loadingGetSettings || loadingUpdateSettings
+                    ? 'Loading settings...'
+                    : loadingSynchronization
+                    ? 'Trying to sync a product...'
+                    : ''
+                }
+                disabled={
+                  loadingSynchronization ||
+                  loadingGetSettings ||
+                  loadingUpdateSettings
+                }
                 value={state.productIDToForceSynchronization}
                 onChange={updateProductIDToForceSynchronization}
               />

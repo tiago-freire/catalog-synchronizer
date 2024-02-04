@@ -8,9 +8,10 @@ type Response = ApiResponse & {
   sku?: unknown
   nostoProduct?: unknown
   nostoResponse?: unknown
+  nostoError?: string
   algoliaProduct?: unknown
   algoliaResponse?: unknown
-  errors?: string[]
+  algoliaError?: string
 }
 
 type MutationArgs = {

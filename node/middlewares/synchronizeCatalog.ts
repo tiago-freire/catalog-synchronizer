@@ -80,9 +80,10 @@ const synchronizeCatalog = async (context: ServiceContext<Clients, State>) => {
 
   let nostoProduct
   let nostoResponse
+  let nostoError
   let algoliaProduct
   let algoliaResponse
-  const errors: string[] = []
+  let algoliaError
 
   // Nosto synchronization
   if (nostoIntegrationEnabled) {
@@ -90,7 +91,7 @@ const synchronizeCatalog = async (context: ServiceContext<Clients, State>) => {
     nostoResponse = await nostoClient
       .updateProduct(nostoProduct)
       .catch((error) => {
-        errors.push(error.message)
+        nostoError = error.message
       })
   }
 
@@ -100,7 +101,7 @@ const synchronizeCatalog = async (context: ServiceContext<Clients, State>) => {
     algoliaResponse = await algoliaClient
       .updateProduct(algoliaProduct)
       .catch((error) => {
-        errors.push(error.message)
+        algoliaError = error.message
       })
   }
 
@@ -114,9 +115,10 @@ const synchronizeCatalog = async (context: ServiceContext<Clients, State>) => {
     sku,
     nostoProduct,
     nostoResponse,
+    nostoError,
     algoliaProduct,
     algoliaResponse,
-    errors,
+    algoliaError,
   }
   context.status = 200
 }

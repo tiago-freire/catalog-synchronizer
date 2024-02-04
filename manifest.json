@@ -108,6 +108,13 @@
       }
     },
     {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "algolia.net",
+        "path": "*"
+      }
+    },
+    {
       "name": "Sku.aspx"
     },
     {
