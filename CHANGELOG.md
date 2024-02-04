@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.0.4] - 2024-02-04
+
 - Complete Nosto and Algolia integration
 
 ## [1.0.3] - 2024-02-03
