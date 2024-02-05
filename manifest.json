@@ -1,7 +1,7 @@
 {
   "name": "catalog-synchronizer",
   "vendor": "ssesandbox04",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "title": "Catalog Synchronizer",
   "description": "Catalog Synchronizer captures product changes through an EndPoint that receives Affiliate Notifications. Received notifications trigger Catalog changes synchronization to third-party systems such as Nosto or Algolia.",
   "dependencies": {
