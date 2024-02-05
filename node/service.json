@@ -14,14 +14,10 @@
     "catalogSynchronizer": {
       "path": "/_v/private/catalogsynchronizer",
       "public": true,
-      "access": "authorized",
       "policies": [
         {
           "effect": "allow",
-          "actions": ["post", "options"],
-          "principals": [
-            "vrn:apps:*:*:*:app/ssesandbox04.catalog-synchronizer@*"
-          ]
+          "actions": ["post", "options"]
         }
       ]
     },
