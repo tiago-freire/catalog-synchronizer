@@ -5,17 +5,13 @@ export default class ProductClient extends JanusClient {
   private baseUrl = '/api/catalog_system/pvt/products/productget'
 
   constructor(context: IOContext, options?: InstanceOptions) {
-    super(
-      // `https://${context.account}.vtexcommercestable.com.br/api/catalog_system/pvt/products/productget`,
-      context,
-      {
-        ...options,
-        headers: {
-          ...options?.headers,
-          VtexIdClientAutCookie: context.authToken,
-        },
-      }
-    )
+    super(context, {
+      ...options,
+      headers: {
+        ...options?.headers,
+        VtexIdClientAutCookie: context.adminUserAuthToken ?? context.authToken,
+      },
+    })
   }
 
   public get(id: string) {
